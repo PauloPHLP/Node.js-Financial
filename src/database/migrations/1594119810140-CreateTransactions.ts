@@ -19,12 +19,14 @@ export default class CreateTransactions1594119810140
             type: 'varchar',
           },
           {
-            name: 'value',
-            type: 'decimal',
-          },
-          {
             name: 'type',
             type: 'varchar',
+          },
+          {
+            name: 'value',
+            type: 'decimal',
+            precision: 10,
+            scale: 2,
           },
           {
             name: 'created_at',

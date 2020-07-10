@@ -1,8 +1,10 @@
-import { getCustomRepository, getRepository } from 'typeorm';
-import TransactionsRepository from '../repositories/TransactionsRepository';
+import { getRepository, getCustomRepository } from 'typeorm';
+import AppError from '../errors/AppError';
+
+import TransactionRepository from '../repositories/TransactionsRepository';
+
 import Transaction from '../models/Transaction';
 import Category from '../models/Category';
-import AppError from '../errors/AppError';
 
 interface Request {
   title: string;
@@ -18,35 +20,34 @@ class CreateTransactionService {
     type,
     category,
   }: Request): Promise<Transaction> {
-    const transactionsRepository = getCustomRepository(TransactionsRepository);
-    const categoriesRepository = getRepository(Category);
-    const { total } = await transactionsRepository.getBalance();
+    const categoryRepository = getRepository(Category);
+    const transactionRepository = getCustomRepository(TransactionRepository);
 
-    if (type === 'outcome' && total < value)
-      throw new AppError('You do not have enough balance.');
+    const balance = await transactionRepository.getBalance();
 
-    let transactionCategory = await categoriesRepository.findOne({
-      where: {
-        title: category,
-      },
+    if (type === 'outcome' && balance.total < value)
+      throw new AppError('You do not have enough balance!');
+
+    let categoryExists = await categoryRepository.findOne({
+      where: { title: category },
     });
 
-    if (!transactionCategory) {
-      transactionCategory = categoriesRepository.create({
+    if (!categoryExists) {
+      categoryExists = await categoryRepository.create({
         title: category,
       });
 
-      await categoriesRepository.save(transactionCategory);
+      await categoryRepository.save(categoryExists);
     }
 
-    const transaction = transactionsRepository.create({
+    const transaction = await transactionRepository.create({
       title,
-      value,
       type,
-      category: transactionCategory,
+      value,
+      category_id: categoryExists.id,
     });
 
-    await transactionsRepository.save(transaction);
+    await transactionRepository.save(transaction);
 
     return transaction;
   }
