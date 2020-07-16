@@ -1,11 +1,11 @@
-# 🖥️ Financial
+# 🖥️ GoFinances
 
 <h1 align="center">
   <img alt="Node.js" src=".github/logo.png" width="200px" />
 </h1>
 
 ## 🔎️ Description
-Back-end side of Financial project.
+Back-end side of GoFinances project.
 
 This project was made during the <a href="https://rocketseat.com.br/gostack">GoStack Boot Camp</a> in 2020.
 
